@@ -1,6 +1,6 @@
 const {existsSync} = require('fs');
 const {address} = require('ip');
-const {resolve, join, posix, relative, dirname, basename, parse, format} = require('path');
+const {resolve, join, posix, dirname, basename, parse} = require('path');
 const readdir = require('@jsdevtools/readdir-enhanced');
 const webpack = require('webpack');
 const chokidar = require('chokidar');
@@ -14,6 +14,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
 const config = require('./config.json');
 
 const SRC = config.src;
@@ -76,7 +77,6 @@ const generateStaticAssets = () => {
     const assetObject = config.static[asset];
     const srcPath = getAssetPath(SRC, assetObject.src);
     const destPath = getAssetPath(DEST, assetObject.dest ? assetObject.dest : assetObject.src);
-
     const assetFolderExist = existsSync(srcPath);
 
     if (assetFolderExist) {
@@ -126,8 +126,7 @@ const pluginsConfiguration = {
     },
   },
   MiniCssExtract: {
-    filename: getAssetName(config.styles.dest, config.styles.bundle, 'css'),
-    chunkFilename: getAssetName(config.styles.dest, '[name]', 'css'),
+    filename: getAssetName(config.styles.dest, '[name]', 'css'),
   },
   DefinePlugin: {
     'process.env': {
@@ -169,28 +168,14 @@ const generateHtmlPlugins = () => {
     const name = parts[0];
     const template = getAssetPath(SRC, `${join(sitePages, name)}.${config.templates.extension}`);
     const filename = getAssetPath(DEST, `${join(config.templates.dest, name)}.html`);
-    const chunks = config.entries ? (name === 'index' ? [config.scripts.bundle, config.styles.bundle] : [name]) : false;
-
-    const minify = () => {
-      if (config.minimize) {
-        return {
-          collapseWhitespace: true,
-          html5: true,
-          removeRedundantAttributes: false,
-        };
-      }
-
-      return config.minimize;
-    };
 
     // Create new HTMLWebpackPlugin with options
     return new HTMLWebpackPlugin({
       title: basename(dirname(__dirname)),
       template,
       filename,
-      chunks,
       excludeChunks: [routesPage],
-      minify: isProduction ? minify() : false,
+      minify: false,
       hash: isProduction ? config.cache_boost : false,
       scriptLoading: 'defer',
       meta: {
@@ -248,14 +233,20 @@ const getPlugins = () => {
   let prodPlugins = [new ImageminPlugin(pluginsConfiguration.ImageMin)];
 
   let defaultPlugins = [
+    new FixStyleOnlyEntriesPlugin({
+      silent: true,
+    }),
     new webpack.ProvidePlugin(pluginsConfiguration.ProvidePlugin),
     new ErrorsPlugin(pluginsConfiguration.ErrorsPlugin),
-    new CopyWebpackPlugin(pluginsConfiguration.CopyPlugin),
     new MiniCssExtractPlugin(pluginsConfiguration.MiniCssExtract),
     new WebpackNotifierPlugin({
       excludeWarnings: true,
     }),
   ];
+
+  if (generateStaticAssets().length) {
+    defaultPlugins.push(new CopyWebpackPlugin(pluginsConfiguration.CopyPlugin));
+  }
 
   if (!isProduction) {
     devPlugins.map((item) => defaultPlugins.push(item));
@@ -503,7 +494,8 @@ const getOptimization = () => {
 
 const getEntries = () => {
   // Need this since useBuildins: usage in babel didn't add polyfill for Promise.all() when webpack is bundling
-  const iterator = ['core-js/modules/es.array.iterator', 'regenerator-runtime/runtime'];
+  // const iterator = ['core-js/modules/es.array.iterator', 'regenerator-runtime/runtime'];
+  const iterator = [];
   const routesPageEntry = posix.resolve(join(config.src, config.scripts.src, 'utils', `${routesPage}.js`));
 
   // default JS entry {app.js} - used for all pages, if no specific entry is provided
@@ -516,7 +508,6 @@ const getEntries = () => {
 
   let entries = {
     [config.scripts.bundle]: [...entry, styleAsset],
-    // [routesPage]: routesPageEntry,
   };
 
   if (!isProduction) {
@@ -529,41 +520,45 @@ const getEntries = () => {
   }
 
   /*
-    additional entries, specified in config.json file as [entries]. Awaiting for HTMLWebpackPlugin ^4.0
+    External entries, specified in config.json file as {externals}. Could be useful, if we need separate CSS file for frameworks like Bootstrap etc.
     Usage in config:
 
-    "entries": {
-      "about": {
-        "js": "about",
-        "css": "main"
-      }
+    "externals": {
+      "bootstrap": "styles/bootstrap.scss",
+      "test": "js/test.js"
     }
+
+    Where [filename] = [key], e.g. "bootstrap": ... => "bootstrap.css"
+
+    This will generate additional CSS file and additional JS file, also - they will be automatically included into the generated HTML page.
   */
 
-  if (config.entries) {
-    for (const entryKey in config.entries) {
-      const additionalEntry = config.entries[entryKey];
-      const JSFileName = additionalEntry.js ? additionalEntry.js : entryKey;
-      const CSSFileName = additionalEntry.css ? additionalEntry.css : entryKey;
+  if (config.externals) {
+    for (const external in config.externals) {
+      const targetBundle = config.externals[external];
 
-      if (JSFileName) {
-        const JSFile = getAssetPath(SRC, `${config.scripts.src}/${JSFileName}.${config.scripts.extension}`);
+      if (typeof targetBundle === 'object') {
+        const bundles = targetBundle.map((bundle) => {
+          const externalBundle = resolve(config.src, bundle);
 
-        if (existsSync(JSFile)) {
-          if (!entries[entryKey]) entries[entryKey] = [];
+          if (existsSync(externalBundle)) {
+            return externalBundle;
+          }
+        });
 
-          entries[entryKey].push(...iterator.concat(JSFile));
+        entries = {
+          [external]: bundles,
+          ...entries,
+        };
+      } else if (typeof targetBundle === 'string') {
+        if (existsSync(targetBundle)) {
+          entries = {
+            [external]: targetBundle,
+            ...entries,
+          };
         }
-      }
-
-      if (CSSFileName) {
-        const CSSFile = CSSFileName && getAssetPath(SRC, `${config.styles.src}/${CSSFileName}.${config.styles.extension}`);
-
-        if (existsSync(CSSFile)) {
-          if (!entries[entryKey]) entries[entryKey] = [];
-
-          entries[entryKey].push(CSSFile);
-        }
+      } else {
+        console.error('Externals property should be a String or Array of strings, e.g. bootstrap: "bundle/path" or bootstrap: ["path/to/scss", "path/to/js"]');
       }
     }
   }
