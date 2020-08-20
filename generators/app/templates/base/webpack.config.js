@@ -507,7 +507,8 @@ const getEntries = () => {
   const styleAsset = getAssetPath(SRC, entryCSSFile);
 
   let entries = {
-    [config.scripts.bundle]: [...entry, styleAsset],
+    [config.scripts.bundle]: [...entry],
+    [config.styles.bundle]: [styleAsset],
   };
 
   if (!isProduction) {

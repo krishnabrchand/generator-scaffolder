@@ -82,10 +82,6 @@ function bootstrapTest({staticExpectedFiles = [], templatesFilesPath, expectedFi
             setProcessToDestination();
             const newCfg = JSON.parse(fs.readFileSync(join(PATHS.tempMarkupFolder, 'config.json')));
             const getStyleFile = () => {
-              if (newCfg.cache_boost) {
-                return join(newCfg.dest, newCfg.styles.dest, `${newCfg.scripts.bundle}.css`);
-              }
-
               return join(newCfg.dest, newCfg.styles.dest, `${newCfg.styles.bundle}.css`);
             };
 
