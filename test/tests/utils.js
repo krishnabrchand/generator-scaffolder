@@ -1,6 +1,6 @@
 const glob = require('glob');
 const rimraf = require('rimraf');
-const { PATHS } = require(`../../generators/app/globals`);
+const { PATHS } = require(`${process.cwd()}/generators/app/globals`);
 
 const cleanUpFolder = async (pattern = `${PATHS.tempFolder}markup/!(node_modules|yarn.lock)`) => {
   await new Promise((resolve, reject) => {

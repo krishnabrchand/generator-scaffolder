@@ -5,9 +5,9 @@ const glob = require('glob');
 const helpers = require('yeoman-test');
 const yeomanAssert = require('yeoman-assert');
 const {join, resolve} = require('path');
-const {getFilesArray, setProcessToDestination, projectTypeMessage} = require(`../../generators/app/utils`);
+const {getFilesArray, setProcessToDestination, projectTypeMessage} = require(`${process.cwd()}/generators/app/utils`);
 const {chaiExecAsync} = require('chai-exec');
-const {PATHS, SCRIPTS, GENERAL_TEST_SETTINGS} = require(`../../generators/app/globals`);
+const {PATHS, SCRIPTS, GENERAL_TEST_SETTINGS} = require(`${process.cwd()}/generators/app/globals`);
 const {cleanUpFolder} = require('./utils');
 
 const ONLY_FILES_TEST = process.env.FILES_ONLY;
