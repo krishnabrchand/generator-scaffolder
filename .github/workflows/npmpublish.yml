@@ -5,11 +5,10 @@ name: npm-publish
 
 on:
   release:
-    types: [created]
+    types: [released]
 
 jobs:
   publish-npm:
-    needs: build
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
