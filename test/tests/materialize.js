@@ -20,13 +20,14 @@ function materializeTest({staticExpectedFiles = [], templatesFilesPath, expected
     const testSettings = {...prompts, ...generalSettings, expectedFilesContent, staticExpectedFiles};
 
     describe(projectTypeMessage(testSettings), async () => {
-      before(async () => {
+      before(async (done) => {
         await cleanUpFolder();
+        done();
         return helpers.run(PATHS.appFolder).cd(PATHS.tempFolder).withPrompts(testSettings);
       });
 
       describe('Generating files:', () => {
-        it(chalk.green('Create expected files'), async () => {
+        it(chalk.green('Create expected files'), async (done) => {
           setProcessToDestination();
 
           const unexpectedFiles = testSettings.staticUnexpectedFiles;
@@ -36,11 +37,12 @@ function materializeTest({staticExpectedFiles = [], templatesFilesPath, expected
 
           yeomanAssert.file(expectedFiles);
           yeomanAssert.noFile(unexpectedFiles);
+          done();
         });
       });
 
       describe('Checking dependencies:', () => {
-        it(chalk.green('Setup settings'), () => {
+        it(chalk.green('Setup settings'), (done) => {
           setProcessToDestination();
 
           const newCfg = JSON.parse(fs.readFileSync(join(PATHS.tempMarkupFolder, 'config.json')));
@@ -59,26 +61,30 @@ function materializeTest({staticExpectedFiles = [], templatesFilesPath, expected
           it(chalk.green('Modules added to package.json:'), () => {
             testSettings.expectedFilesContent.json.map((content) => yeomanAssert.jsonFileContent(newPkgfilePath, content));
           });
+
+          done();
         });
       });
 
       if (!ONLY_FILES_TEST) {
         describe('Installing dependencies:', () => {
-          it(chalk.green('Install all dependencies'), async () => {
+          it(chalk.green('Install all dependencies'), async (done) => {
             const cli = await chaiExecAsync(SCRIPTS.install);
             assert.exitCode(cli, 0);
+            done();
           });
         });
 
         describe('Running build process:', () => {
-          it(chalk.green('Build process is correct:'), async () => {
+          it(chalk.green('Build process is correct:'), async (done) => {
             const cli = await chaiExecAsync(SCRIPTS.build);
             assert.exitCode(cli, 0);
+            done();
           });
         });
 
         describe('Building correct files:', () => {
-          it(chalk.green('Generate all files based on project config'), async () => {
+          it(chalk.green('Generate all files based on project config'), async (done) => {
             setProcessToDestination();
             const newCfg = JSON.parse(fs.readFileSync(join(PATHS.tempMarkupFolder, 'config.json')));
             const getStyleFile = () => {
@@ -95,6 +101,8 @@ function materializeTest({staticExpectedFiles = [], templatesFilesPath, expected
               expectedCompilation.push(...files);
               yeomanAssert.file(expectedCompilation);
             });
+
+            done();
           });
         });
       }
