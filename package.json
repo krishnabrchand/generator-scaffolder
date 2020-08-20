@@ -43,8 +43,8 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "test:files": "cross-env FILES_ONLY=true mocha",
-    "test": "mocha"
+    "test:files": "cross-env FILES_ONLY=true mocha test/index.js -S --timeout infinite",
+    "test": "mocha -S --timeout infinite"
   },
   "lint-staged": {
     "*.js": [
