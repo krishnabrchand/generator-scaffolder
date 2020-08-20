@@ -20,9 +20,16 @@ function materializeTest({staticExpectedFiles = [], templatesFilesPath, expected
     const testSettings = {...prompts, ...generalSettings, expectedFilesContent, staticExpectedFiles};
 
     describe(projectTypeMessage(testSettings), async () => {
-      before(async () => {
-        await cleanUpFolder();
-        return helpers.run(PATHS.appFolder).cd(PATHS.tempFolder).withPrompts(testSettings);
+      before(() => {
+        return new Promise(async (resolve, reject) => {
+          try {
+            await cleanUpFolder();
+            await helpers.run(PATHS.appFolder).cd(PATHS.tempFolder).withPrompts(testSettings);
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        });
       });
 
       describe('Generating files:', () => {
