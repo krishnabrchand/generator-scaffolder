@@ -9,7 +9,11 @@ const cleanUpFolder = async (pattern = `${PATHS.tempFolder}markup/!(node_modules
         await Promise.all(
           matches.map((match, i) => {
             return new Promise((res) => {
-              rimraf(match, () => res(match));
+              try {
+                rimraf(match, () => res(match));
+              } catch(err) {
+                reject(err)
+              }
             });
           })
         );

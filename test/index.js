@@ -27,37 +27,19 @@ for (const key in TESTS_SETTINGS.templating) {
     const templatesFiles = TESTS_SETTINGS.templating[key];
 
     describe(title(`Markup + ${key}`), () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await Promise.all([
-            defaultTest(getProjectSettings(TESTS_SETTINGS.markup.default, templatesFiles)),
-            bootstrapTest(getProjectSettings(TESTS_SETTINGS.markup.bootstrap, templatesFiles)),
-            materializeTest(getProjectSettings(TESTS_SETTINGS.markup.materialize, templatesFiles)),
-            tailwindTest(getProjectSettings(TESTS_SETTINGS.markup.tailwind, templatesFiles)),
-            zurbTest(getProjectSettings(TESTS_SETTINGS.markup.zurb, templatesFiles)),
-          ]);
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      });
+      defaultTest(getProjectSettings(TESTS_SETTINGS.markup.default, templatesFiles));
+      bootstrapTest(getProjectSettings(TESTS_SETTINGS.markup.bootstrap, templatesFiles));
+      materializeTest(getProjectSettings(TESTS_SETTINGS.markup.materialize, templatesFiles));
+      tailwindTest(getProjectSettings(TESTS_SETTINGS.markup.tailwind, templatesFiles));
+      zurbTest(getProjectSettings(TESTS_SETTINGS.markup.zurb, templatesFiles));
     });
 
     describe(title(`Markup + Wordpress + ${key}`), () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await Promise.all([
-            defaultTest(getProjectSettings(TESTS_SETTINGS.wp.default, templatesFiles)),
-            bootstrapTest(getProjectSettings(TESTS_SETTINGS.wp.bootstrap, templatesFiles)),
-            materializeTest(getProjectSettings(TESTS_SETTINGS.wp.materialize, templatesFiles)),
-            tailwindTest(getProjectSettings(TESTS_SETTINGS.wp.tailwind, templatesFiles)),
-            zurbTest(getProjectSettings(TESTS_SETTINGS.wp.zurb, templatesFiles)),
-          ]);
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      });
+      defaultTest(getProjectSettings(TESTS_SETTINGS.wp.default, templatesFiles));
+      bootstrapTest(getProjectSettings(TESTS_SETTINGS.wp.bootstrap, templatesFiles));
+      materializeTest(getProjectSettings(TESTS_SETTINGS.wp.materialize, templatesFiles));
+      tailwindTest(getProjectSettings(TESTS_SETTINGS.wp.tailwind, templatesFiles));
+      zurbTest(getProjectSettings(TESTS_SETTINGS.wp.zurb, templatesFiles));
     });
   }
 }
