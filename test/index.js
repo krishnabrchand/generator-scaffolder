@@ -4,8 +4,8 @@ const defaultTest = require('./tests/default');
 const zurbTest = require('./tests/zurb');
 const materializeTest = require('./tests/materialize');
 const tailwindTest = require('./tests/tailwind');
-const {TESTS_SETTINGS} = require(`${process.env.PWD}/generators/app/globals`);
-const {mergeDeep} = require(`${process.env.PWD}/generators/app/utils`);
+const {TESTS_SETTINGS} = require(`../../generators/app/globals`);
+const {mergeDeep} = require(`../../generators/app/utils`);
 
 const title = (text) => {
   return chalk.bgCyan(chalk.bold.black(`
