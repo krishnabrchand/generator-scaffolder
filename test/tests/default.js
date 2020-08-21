@@ -19,7 +19,7 @@ function defaultTest({staticExpectedFiles = [], templatesFilesPath, expectedFile
   return Promise.all([
     GENERAL_TEST_SETTINGS.forEach((prompts) => {
       const testSettings = {...prompts, ...generalSettings, expectedFilesContent, staticExpectedFiles};
-  
+
       describe(projectTypeMessage(testSettings), () => {
         before(() => {
           return new Promise(async (resolve, reject) => {
@@ -32,33 +32,35 @@ function defaultTest({staticExpectedFiles = [], templatesFilesPath, expectedFile
             }
           });
         });
-  
+
         describe('Generating files:', () => {
           it(chalk.green('Create expected files'), () => {
-            try {
-              await setProcessToDestination();
-  
-              const unexpectedFiles = testSettings.staticUnexpectedFiles;
-              const expectedFiles = [...(await getFilesArray(templatesFilesPath))].concat(testSettings.staticExpectedFiles);
-    
-              yeomanAssert.file(expectedFiles);
-              yeomanAssert.noFile(unexpectedFiles);
-              resolve();
-            } catch (err) {
-              reject(err);
-            }
+            return new Promise(async (resolve, reject) => {
+              try {
+                await setProcessToDestination();
+
+                const unexpectedFiles = testSettings.staticUnexpectedFiles;
+                const expectedFiles = [...(await getFilesArray(templatesFilesPath))].concat(testSettings.staticExpectedFiles);
+
+                yeomanAssert.file(expectedFiles);
+                yeomanAssert.noFile(unexpectedFiles);
+                resolve();
+              } catch (err) {
+                reject(err);
+              }
+            });
           });
         });
-  
+
         describe('Checking dependencies:', () => {
           it(chalk.green('Setup settings'), () => {
             return new Promise(async (resolve, reject) => {
               try {
                 await setProcessToDestination();
-  
+
                 const newCfg = JSON.parse(fs.readFileSync(join(PATHS.tempMarkupFolder, 'config.json')));
                 const stylesFile = join(PATHS.tempMarkupFolder, newCfg.src, newCfg.styles.src, `${newCfg.styles.bundle}.${newCfg.styles.extension}`);
-      
+
                 if (testSettings.expectedFilesContent.hasOwnProperty('styles')) {
                   it(chalk.green('Added all necessary content to Styles:'), () => {
                     testSettings.expectedFilesContent.styles.map((content) => yeomanAssert.fileContent(stylesFile, content));
@@ -69,10 +71,9 @@ function defaultTest({staticExpectedFiles = [], templatesFilesPath, expectedFile
                 reject(err);
               }
             });
-            
           });
         });
-  
+
         if (!ONLY_FILES_TEST) {
           describe('Installing dependencies:', () => {
             it(chalk.green('Install all dependencies'), () => {
@@ -87,7 +88,7 @@ function defaultTest({staticExpectedFiles = [], templatesFilesPath, expectedFile
               });
             });
           });
-  
+
           describe('Running build process:', () => {
             it(chalk.green('Build process is correct:'), () => {
               return new Promise(async (resolve, reject) => {
@@ -101,7 +102,7 @@ function defaultTest({staticExpectedFiles = [], templatesFilesPath, expectedFile
               });
             });
           });
-  
+
           describe('Building correct files:', () => {
             it(chalk.green('Generate all files based on project config'), async () => {
               return new Promise(async (resolve, reject) => {
@@ -111,18 +112,18 @@ function defaultTest({staticExpectedFiles = [], templatesFilesPath, expectedFile
                   const getStyleFile = () => {
                     return join(newCfg.dest, newCfg.styles.dest, `${newCfg.styles.bundle}.css`);
                   };
-      
+
                   const stylesFile = getStyleFile();
                   const jsFile = join(newCfg.dest, newCfg.scripts.dest, `${newCfg.scripts.bundle}.${newCfg.scripts.extension}`);
                   const HTMLFiles = join(newCfg.dest, newCfg.templates.dest, `*.${newCfg.templates.extension}`);
-      
+
                   const expectedCompilation = [stylesFile, jsFile];
-      
+
                   glob(HTMLFiles, {}, async (err, files) => {
                     expectedCompilation.push(...files);
                     yeomanAssert.file(expectedCompilation);
                   });
-  
+
                   resolve();
                 } catch (error) {
                   reject(err);
@@ -132,8 +133,8 @@ function defaultTest({staticExpectedFiles = [], templatesFilesPath, expectedFile
           });
         }
       });
-    })
-  ])
+    }),
+  ]);
 }
 
 module.exports = defaultTest;

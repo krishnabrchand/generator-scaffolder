@@ -25,7 +25,7 @@ function bootstrapTest({staticExpectedFiles = [], templatesFilesPath, expectedFi
           return new Promise(async (resolve, reject) => {
             try {
               await cleanUpFolder();
-              return helpers.run(PATHS.appFolder).cd(PATHS.tempFolder).withPrompts(testSettings);
+              await helpers.run(PATHS.appFolder).cd(PATHS.tempFolder).withPrompts(testSettings);
               resolve();
             } catch (error) {
               reject(error);
