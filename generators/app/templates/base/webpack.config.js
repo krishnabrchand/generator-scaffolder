@@ -540,28 +540,27 @@ const getEntries = () => {
   // Need this since useBuildins: usage in babel didn't add polyfill for Promise.all() when webpack is bundling
   // const iterator = ['core-js/modules/es.array.iterator', 'regenerator-runtime/runtime'];
   const iterator = [];
+  let entries = {};
   const routesPageEntry = posix.resolve(join(config.src, config.scripts.src, 'utils', `${routesPage}.js`));
 
-  // default JS entry {app.js} - used for all pages, if no specific entry is provided
-  const entryJsFile = join(config.scripts.src, `${config.scripts.bundle}.${config.scripts.extension}`);
-  const entry = iterator.concat([getAssetPath(SRC, entryJsFile)]);
+  if (config.scripts) {
+    // default JS entry {app.js} - used for all pages, if no specific entry is provided
+    const entryJsFile = join(config.scripts.src, `${config.scripts.bundle}.${config.scripts.extension}`);
+    const entry = iterator.concat([getAssetPath(SRC, entryJsFile)]);
 
-  // default CSS entry {main.scss} - used for all pages, if no specific entry is provided
-  const entryCSSFile = join(config.styles.src, `${config.styles.bundle}.${config.styles.extension}`);
-  const styleAsset = getAssetPath(SRC, entryCSSFile);
+    entries[config.scripts.bundle] = [...entry];
+  }
 
-  let entries = {
-    [config.scripts.bundle]: [...entry],
-    [config.styles.bundle]: [styleAsset],
-  };
+  if (config.styles) {
+    // default CSS entry {main.scss} - used for all pages, if no specific entry is provided
+    const entryCSSFile = join(config.styles.src, `${config.styles.bundle}.${config.styles.extension}`);
+    const styleAsset = getAssetPath(SRC, entryCSSFile);
+
+    entries[config.styles.bundle] = [styleAsset];
+  }
 
   if (!isProduction) {
-    entries = {
-      ...entries,
-      ...{
-        [routesPage]: routesPageEntry,
-      },
-    };
+    entries[routesPage] = routesPageEntry;
   }
 
   if (config.externals) entries = addExternalEntries(entries);
