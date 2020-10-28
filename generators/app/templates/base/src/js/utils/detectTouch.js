@@ -3,8 +3,8 @@ const noTouchClass = 'no-touchevents';
 
 const touchevents = (obj = window, toggleClass = false) => {
   const HTML = obj.document.documentElement;
- 
-  if (('ontouchstart' in obj) || (obj.DocumentTouch && document instanceof DocumentTouch)) {
+
+  if ('ontouchstart' in obj || (obj.DocumentTouch && document instanceof DocumentTouch)) {
     if (toggleClass) {
       HTML.classList.remove(noTouchClass);
       HTML.classList.add(touchClass);
@@ -17,8 +17,8 @@ const touchevents = (obj = window, toggleClass = false) => {
     }
     return false;
   }
-}
+};
 
-touchevents(window, true)
+touchevents(window, true);
 
-export {touchevents as default}
+export { touchevents as default };

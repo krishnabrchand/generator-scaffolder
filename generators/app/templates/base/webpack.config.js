@@ -342,14 +342,14 @@ const getScriptsLoader = (templateType) => {
       // /node_modules\/(?!(module_to_include)\/).*/
       test: /\.tsx?$/,
       exclude: /node_modules/,
-      loaders: ['awesome-typescript-loader', 'webpack-module-hot-accept'],
+      loaders: ['awesome-typescript-loader'],
     };
   }
 
   return {
     test: /\.m?js$/,
     exclude: /node_modules/,
-    loaders: ['babel-loader', 'webpack-module-hot-accept'],
+    loaders: ['babel-loader'],
   };
 };
 
@@ -465,6 +465,77 @@ const getOptimization = () => {
   };
 };
 
+/*
+    External entries, specified in config.json file as {externals}. Could be useful, if we need separate CSS file for frameworks like Bootstrap etc.
+    Usage in config:
+
+    "externals": {
+      "bootstrap": "styles/bootstrap.scss",
+      "test": "js/test.js"
+    }
+
+    Where [filename] = [key], e.g. "bootstrap": ... => "bootstrap.css"
+
+    This will generate additional CSS file and additional JS file, also - they will be automatically included into the generated HTML page.
+*/
+const addExternalEntries = (entries) => {
+  const EXTERNAL_POSITIONS = {
+    before: 'beforeBundle',
+    after: 'afterBundle',
+    error: 'Order should be "beforeBundle" or "afterBundle" only',
+  };
+  for (const external in config.externals) {
+    const targetBundle = config.externals[external];
+    const order = config.externals.order || EXTERNAL_POSITIONS.before; // externals inclusion order, afterBundle - add after main bundles, beforeBundle - add before main bundles
+
+    if (typeof targetBundle === 'object') {
+      const bundles = targetBundle.map((bundle) => {
+        const externalBundle = resolve(__dirname, config.src, bundle);
+
+        if (existsSync(externalBundle)) {
+          return externalBundle;
+        }
+      });
+
+      if (order === EXTERNAL_POSITIONS.before) {
+        entries = {
+          [external]: bundles,
+          ...entries,
+        };
+      } else if (order === EXTERNAL_POSITIONS.after) {
+        entries = {
+          ...entries,
+          [external]: bundles,
+        };
+      } else {
+        throw new Error(EXTERNAL_POSITIONS.error);
+      }
+    } else if (typeof targetBundle === 'string') {
+      const externalBundle = resolve(__dirname, config.src, targetBundle);
+
+      if (existsSync(externalBundle)) {
+        if (order === EXTERNAL_POSITIONS.before) {
+          entries = {
+            [external]: externalBundle,
+            ...entries,
+          };
+        } else if (order === EXTERNAL_POSITIONS.after) {
+          entries = {
+            ...entries,
+            [external]: externalBundle,
+          };
+        } else {
+          throw new Error(EXTERNAL_POSITIONS.error);
+        }
+      }
+    } else {
+      console.error('Externals property should be a String or Array of strings, e.g. bootstrap: "bundle/path" or bootstrap: ["path/to/scss", "path/to/js"]');
+    }
+  }
+
+  return entries;
+};
+
 const getEntries = () => {
   // Need this since useBuildins: usage in babel didn't add polyfill for Promise.all() when webpack is bundling
   // const iterator = ['core-js/modules/es.array.iterator', 'regenerator-runtime/runtime'];
@@ -493,51 +564,7 @@ const getEntries = () => {
     };
   }
 
-  /*
-    External entries, specified in config.json file as {externals}. Could be useful, if we need separate CSS file for frameworks like Bootstrap etc.
-    Usage in config:
-
-    "externals": {
-      "bootstrap": "styles/bootstrap.scss",
-      "test": "js/test.js"
-    }
-
-    Where [filename] = [key], e.g. "bootstrap": ... => "bootstrap.css"
-
-    This will generate additional CSS file and additional JS file, also - they will be automatically included into the generated HTML page.
-  */
-
-  if (config.externals) {
-    for (const external in config.externals) {
-      const targetBundle = config.externals[external];
-
-      if (typeof targetBundle === 'object') {
-        const bundles = targetBundle.map((bundle) => {
-          const externalBundle = resolve(__dirname, config.src, bundle);
-
-          if (existsSync(externalBundle)) {
-            return externalBundle;
-          }
-        });
-
-        entries = {
-          [external]: bundles,
-          ...entries,
-        };
-      } else if (typeof targetBundle === 'string') {
-        const externalBundle = resolve(__dirname, config.src, targetBundle);
-
-        if (existsSync(externalBundle)) {
-          entries = {
-            [external]: externalBundle,
-            ...entries,
-          };
-        }
-      } else {
-        console.error('Externals property should be a String or Array of strings, e.g. bootstrap: "bundle/path" or bootstrap: ["path/to/scss", "path/to/js"]');
-      }
-    }
-  }
+  if (config.externals) entries = addExternalEntries(entries);
 
   return entries;
 };
@@ -545,7 +572,7 @@ const getEntries = () => {
 const webpackConfig = {
   mode: ENV,
   entry: getEntries(),
-  devtool: isProduction ? false : 'inline-source-map',
+  devtool: isProduction ? false : 'eval-source-map',
   stats: isProduction,
   output: {
     publicPath: PUBLIC_PATH,

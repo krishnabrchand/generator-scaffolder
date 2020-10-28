@@ -57,7 +57,7 @@ export const isTouch = (obj = window) => touchevents(obj);
   ready(() => init());
 */
 
-export default Document.prototype.ready = fn => {
+export default Document.prototype.ready = (fn) => {
   if (fn && typeof fn === 'function') {
     document.addEventListener('DOMContentLoaded', () => {
       if (document.readyState === 'interactive' || document.readyState === 'complete') {
@@ -66,7 +66,6 @@ export default Document.prototype.ready = fn => {
     });
   }
 };
-
 
 /*
   Utility function for native wrap:
@@ -137,7 +136,7 @@ export const wrapAll = (nodes, wrapper) => {
 */
 
 export const ev = (eventName, data, target = document) => {
-  const e = new CustomEvent(eventName, {detail: data});
+  const e = new CustomEvent(eventName, { detail: data });
   target.dispatchEvent(e);
 };
 
