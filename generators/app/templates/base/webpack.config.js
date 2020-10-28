@@ -1,6 +1,6 @@
-const {existsSync} = require('fs');
-const {address} = require('ip');
-const {resolve, join, posix, dirname, basename, parse} = require('path');
+const { existsSync } = require('fs');
+const { address } = require('ip');
+const { resolve, join, posix, dirname, basename, parse } = require('path');
 const readdir = require('@jsdevtools/readdir-enhanced');
 const webpack = require('webpack');
 const chokidar = require('chokidar');
@@ -13,8 +13,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
+const imageminMozjpeg = require('imagemin-mozjpeg');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const config = require('./config.json');
 
 const SRC = config.src;
@@ -105,7 +107,7 @@ const pluginsConfiguration = {
     noInfo: true,
     open: config.server.open,
     clientLogLevel: 'silent',
-    before(app, {options}) {
+    before(app, { options }) {
       const PORT = config.server.port || options.port;
 
       options.port = PORT;
@@ -113,7 +115,7 @@ const pluginsConfiguration = {
     },
     after(app, server, compiler) {
       const files = [getAssetPath(SRC, config.templates.src), getAssetPath(SRC, config.scripts.src)];
-      const {port} = server.options;
+      const { port } = server.options;
 
       chokidar.watch(files).on('change', () => {
         server.sockWrite(server.sockets, 'content-changed');
@@ -144,6 +146,11 @@ const pluginsConfiguration = {
     context: getAssetPath(SRC, config.styles.src),
     syntax: config.styles.extension,
   },
+  ESLint: {
+    overrideConfigFile: 'eslintrc.js',
+    extensions: ['.js'],
+    files: join(config.src, config.scripts.src),
+  },
   ErrorsPlugin: {
     clearConsole: true,
   },
@@ -152,9 +159,16 @@ const pluginsConfiguration = {
   },
   ImageMin: {
     cacheFolder: resolve(__dirname, 'node_modules/.cache'),
+    disable: !isProduction,
     pngquant: {
       quality: '70-80',
     },
+    plugins: [
+      imageminMozjpeg({
+        quality: 70,
+        progressive: true,
+      }),
+    ],
   },
 };
 
@@ -176,6 +190,7 @@ const generateHtmlPlugins = () => {
       filename,
       excludeChunks: [routesPage],
       minify: false,
+      inject: 'body',
       hash: isProduction ? config.cache_boost : false,
       scriptLoading: 'defer',
       meta: {
@@ -233,15 +248,11 @@ const getPlugins = () => {
   let prodPlugins = [new ImageminPlugin(pluginsConfiguration.ImageMin)];
 
   let defaultPlugins = [
-    new FixStyleOnlyEntriesPlugin({
-      silent: true,
-    }),
+    new FixStyleOnlyEntriesPlugin({ silent: true }),
     new webpack.ProvidePlugin(pluginsConfiguration.ProvidePlugin),
     new ErrorsPlugin(pluginsConfiguration.ErrorsPlugin),
     new MiniCssExtractPlugin(pluginsConfiguration.MiniCssExtract),
-    new WebpackNotifierPlugin({
-      excludeWarnings: true,
-    }),
+    new WebpackNotifierPlugin({ excludeWarnings: true }),
   ];
 
   if (generateStaticAssets().length) {
@@ -259,6 +270,10 @@ const getPlugins = () => {
   // enable linters only if config.linters === true
   if (config.linters && config.linters.css) {
     defaultPlugins.push(new StyleLintPlugin(pluginsConfiguration.StyleLint));
+  }
+
+  if (config.linters && config.linters.js) {
+    defaultPlugins.push(new ESLintPlugin(pluginsConfiguration.ESLint));
   }
 
   // add bundle analyze only if config.debug === true;
@@ -303,7 +318,7 @@ const getTemplatesLoader = (templateType) => {
               });
 
               context.addDependency(data); // Force webpack to watch file
-              return context.fs.readJsonSync(data, {throws: false}) || {};
+              return context.fs.readJsonSync(data, { throws: false }) || {};
             },
             namespaces: {
               layout: resolve(__dirname, 'src/views/_layout'),
@@ -338,57 +353,38 @@ const getScriptsLoader = (templateType) => {
   };
 };
 
-const getStaticAssetOutput = ({context, resourcePath, assets}) => {
-  const basePath = posix.relative(context, resourcePath);
-  const from = posix.join(config.src, assets.src);
-  const to = assets.dest || assets.src;
-  const assetPath = basePath.replace(from, to);
-
-  return assetPath;
-};
-
 const getModules = () => {
   const modules = {
     rules: [
       {
         test: /\.(sa|sc|c)ss$/,
         use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              hmr: !isProduction,
-              url: false,
-              reloadAll: true,
-              sourceMap: true,
-            },
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
+          isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
+          'css-loader',
           {
             loader: 'postcss-loader',
             options: {
-              ident: 'postcss',
-              sourceMap: true,
-              config: {
-                ctx: {
-                  cssnano: config.minimize ? true : false,
+              postcssOptions: {
+                plugins: {
+                  cssnano: config.minimize && isProduction ? {} : false,
+                  perfectionist:
+                    config.minimize && isProduction
+                      ? false
+                      : {
+                          cascade: false,
+                          colorShorthand: false,
+                          indentSize: 2,
+                          maxSelectorLength: false,
+                          maxAtRuleLength: false,
+                          maxValueLength: false,
+                        },
                 },
+                config: true,
               },
             },
           },
-          {
-            loader: 'group-css-media-queries-loader',
-          },
-          {
-            loader: 'sass-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
+          'group-css-media-queries-loader',
+          'sass-loader',
         ],
       },
       {
@@ -422,29 +418,6 @@ const getModules = () => {
       },
     ],
   };
-
-  if (!isProduction && config.linters) {
-    modules.rules.push({
-      test: /\.jsx?$/,
-      loader: 'prettier-loader',
-      exclude: /node_modules/,
-      options: {
-        parser: 'babel',
-      },
-    });
-
-    if (config.linters.js) {
-      modules.rules.push({
-        enforce: 'pre',
-        test: /\.jsx?$/,
-        loader: 'eslint-loader',
-        exclude: /node_modules/,
-        options: {
-          configFile: 'eslintrc.js',
-        },
-      });
-    }
-  }
 
   modules.rules.unshift(getScriptsLoader(config.scripts.extension), getTemplatesLoader(config.templates.extension));
 
@@ -540,7 +513,7 @@ const getEntries = () => {
 
       if (typeof targetBundle === 'object') {
         const bundles = targetBundle.map((bundle) => {
-          const externalBundle = resolve(config.src, bundle);
+          const externalBundle = resolve(__dirname, config.src, bundle);
 
           if (existsSync(externalBundle)) {
             return externalBundle;
@@ -552,9 +525,11 @@ const getEntries = () => {
           ...entries,
         };
       } else if (typeof targetBundle === 'string') {
-        if (existsSync(targetBundle)) {
+        const externalBundle = resolve(__dirname, config.src, targetBundle);
+
+        if (existsSync(externalBundle)) {
           entries = {
-            [external]: targetBundle,
+            [external]: externalBundle,
             ...entries,
           };
         }
@@ -580,6 +555,7 @@ const webpackConfig = {
   },
   plugins: getPlugins(),
   resolve: {
+    mainFiles: ['index'],
     extensions: [`.${config.scripts.extension}`],
     alias: {
       JS: getAssetPath(SRC, config.scripts.src),
@@ -590,7 +566,10 @@ const webpackConfig = {
       Animations: getAssetPath(SRC, `${config.scripts.src}/animations`),
     },
   },
-  optimization: getOptimization(),
+  optimization: {
+    usedExports: true,
+    ...getOptimization(),
+  },
   module: getModules(),
   devServer: pluginsConfiguration.DevServer,
 };
