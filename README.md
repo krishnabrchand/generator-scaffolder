@@ -185,10 +185,14 @@ You can see default structure of this file: **`enable/disable` means `true/false
 Lets take more precise look into each of the config sections:
 
 #### Baseline
-`"src": "src"` - source files folder name. If you need another folder - rename folder and change this name inside `config`
-`"dest": "dist"` - folder where all files will be compiled, same as with src - if you need to change this, rename folder and change `config`
+`"src": "src"` - source files folder name. If you need another folder - rename folder and change this name inside `config`.
+
+`"dest": "dist"` - folder where all files will be compiled, same as with src - if you need to change this, rename folder and change `config`.
+
 `"debug": false` - if `true`, enable [Webpack Bundle Analyzer](https://www.npmjs.com/package/webpack-bundle-analyzer) in production mode.
+
 `"cache_boost": false` - if `true` - add extra hash for every bundle, e.g. `app.js?9fa40fa90e1c6031a8e7` - good for cache boost for static websites, and also split `app.js` file into separate files: your custom code, vendors code and `runtime.js` file - to make sure everything load as it should.
+
 `"minimize": true` - if `false` - disable `CSS/JS` minification. Enabled by default
 
 #### Linters
@@ -199,9 +203,14 @@ Lets take more precise look into each of the config sections:
 },
 ```
 Enabled by default, do disable - switch to `false`, e.g `"css": false` to disable `Stylelint`, or `"linters": false` - if you don't need them at all.
-**IMPORTANT NOTE**: 
+
+**IMPORTANT NOTE**:
+
 If project was generate **with** `linters` option enabled - you can `enable/disable` them at any time.
-If project was generated **without** `linters` option enabled - you can't `enable` them in future. In this case - you can generate dummy project with those options enabled and grab `styleline.config.js, .stylelintignore, .prettierignore, prettier.config.js, eslintrc.js` files and put into root of your project folder.
+
+If project was generated **without** `linters` option enabled - you can't `enable` them in future.
+
+In this case - you can generate dummy project with those options enabled and grab `styleline.config.js, .stylelintignore, .prettierignore, prettier.config.js, eslintrc.js` files and put into root of your project folder.
 
 #### Webpack dev server configuration
 ```
