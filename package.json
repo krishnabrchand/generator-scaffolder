@@ -1,5 +1,5 @@
 {
-  "version": "2.0.20",
+  "version": "2.0.19-beta2",
   "name": "generator-p2h",
   "files": [
     "generators"
