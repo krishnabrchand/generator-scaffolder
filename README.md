@@ -1,8 +1,8 @@
 # Projects scaffolding tool
 
-**Project generator that contain various types of projects base structure:**
+**Project generator contains various types of projects base structure:**
 * Markup only
-* Markup + CMS (Wordpress or another one)
+* Markup + CMS (Wordpress or other)
 * Markup + Frameworks (Bootstrap, Zurb Foudation, Materialize, Tailwind CSS)
 * Markup + PUG (and/or frameworks, CMS)
 * Markup + Twig (and/or frameworks, CMS)
@@ -18,15 +18,15 @@
 
 ## Installation
 
-Generator is based on `Node JS` and `Yeoman` generator. First of all, you need to install them:
+This generator is based on `Node JS` and `Yeoman` generator. For starters, you need to install them:
 
-[Node JS](https://nodejs.org/) - install latest recommended (**minimal version is 10**)
+[Node JS](https://nodejs.org/) - install latest recommended version(**minimal version is 10**)
 [Yeoman](https://yeoman.io/) - `npm install -g yo`
 
-If you already have Node JS, then check version:
- `node -v` - **should be 10+. If your version is earlier than 10 - upgrade your Node JS**
+If you have Node JS installed already, please check version and make sure it is 10+:
+ `node -v` - **If your version is earlier than 10 - upgrade your Node JS**
 
-Once you have Node JS and Yeoman installed, you ready to install generator itself.
+Once you have Node JS and Yeoman installed, you are ready to install the generator itself.
 
 ### Usage as NPM module from registry
 Generator is an `npm` module, so you can easily install it using `npm` or `yarn`:
@@ -42,9 +42,9 @@ The main cons of this method - is that you can grab only released version of mod
 ***If you want always to be up-to-date - check next method.***
 
 ### Local usage
-There is an option to use generator as local NPM module. The main benefit of this type of usage is that you don't need to wait until generator will be published to npm (not every fix/update/feature is published as new version to NPM), but you can just `git pull` latest code - and you up do date with latest version of generator.
+There is an option to use generator as a local NPM module. The main benefit of this type of usage is that you don't have to wait until generator is published to npm (not every fix/update/feature is published as a new version to NPM), but you can just `git pull` the latest code - and you are up do date with the latest version of the generator.
 
-To install, few steps required:
+To install, a few steps are required:
 1. Clone [github](https://github.com/mrlss/generator-scaffolder) repository - you can put this folder in any place you want 
 2. `cd` into this folder - `cd *YOUR_PATH*/generator-scaffolder` . Next step depends on which package manager you use, `NPM` or `Yarn`
 3. `npm link` or `yarn link`
@@ -57,9 +57,9 @@ To upgrade to latest version:
 
 ## How to use
 
-1.  Generate project: `yo p2h` and choose project settings you need (**_if you already has project installed, skip this step_**).
+1.  Generate project: `yo p2h` and choose project settings you need (**_if you already have project installed, plaese skip this step_**).
 
-2.  Install project dependencies: (**_if you already has modules installed, skip this step_**)
+2.  Install project dependencies: (**_if you already have modules installed, please skip this step_**)
 ```
 #Using npm
 npm i
@@ -78,7 +78,7 @@ npm run dev
 yarn dev
 ```
 
-4.  To compile all assest into production mode, run:
+4.  To compile all assests into production mode, run:
 ```
 #Using npm
 npm run build
@@ -100,7 +100,7 @@ yarn preview
 ```
 To preview builded assets, for example. Used module `serve` under the hood.
 
-2. Pretify HTML after compilation
+2. Prettify HTML after compilation
 ```
 #Using npm
 npm run pretify:html
@@ -110,7 +110,7 @@ yarn pretify:html
 ```
 Uses Prettier to pretify HTML files from `dist` folder. Can be used only after compilation process.
 
-**_Dont use `npm` and `yarn` in the same project - this can lead to unnexpected results_**
+**_Don't use `npm` and `yarn` in the same project - this can lead to unexpected results_**
 
 ## What's included 
 
@@ -206,7 +206,7 @@ Enabled by default, do disable - switch to `false`, e.g `"css": false` to disabl
 
 **IMPORTANT NOTE**:
 
-If project was generate **with** `linters` option enabled - you can `enable/disable` them at any time.
+If project was generated **with** `linters` option enabled - you can `enable/disable` them at any time.
 
 If project was generated **without** `linters` option enabled - you can't `enable` them in future.
 
@@ -218,7 +218,7 @@ In this case - you can generate dummy project with those options enabled and gra
     "open": true
 },
 ```
-`open`: if `true` - new page will open everytime you start build.  If you dont need this - switch to `false`
+`open`: if `true` - new page will open everytime you start build.  If you don't need this - switch to `false`
 
 #### Styles bundle configuration
 ```
