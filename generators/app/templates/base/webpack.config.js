@@ -105,8 +105,11 @@ const pluginsConfiguration = {
     overlay: true,
     useLocalIp: true,
     noInfo: true,
-    open: config.server.open,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
     clientLogLevel: 'silent',
+    ...(config.server || {}),
     before(app, { options }) {
       const PORT = config.server.port || options.port;
 
@@ -122,8 +125,11 @@ const pluginsConfiguration = {
       });
 
       compiler.hooks.done.tap('show-server-settings', (stats) => {
-        if (stats.hasErrors()) return;
-        postServerMessage(port);
+        try {
+          postServerMessage(port);
+        } catch (error) {
+          console.error(error);
+        }
       });
     },
   },
@@ -191,8 +197,9 @@ const generateHtmlPlugins = () => {
       excludeChunks: [routesPage],
       minify: false,
       inject: 'body',
-      hash: isProduction ? config.cache_boost : false,
+      hash: isProduction && !config.externals ? config.cache_boost : false,
       scriptLoading: 'defer',
+      cache: false,
       meta: {
         viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no',
       },
@@ -230,18 +237,6 @@ const htmlPlugins = () => {
 
   return plugins;
 };
-
-if (isProduction && config.critical_css) {
-  console.log('Critical CSS feature is comming soon...');
-  // htmlPlugins.push(
-  //   new Critters({
-  //     inlineFonts: true,
-  //     pruneSource: config.entries ? true : false,
-  //     noscriptFallback: true,
-  //     preload: 'swap',
-  //   })
-  // );
-}
 
 const getPlugins = () => {
   let devPlugins = [new webpack.DefinePlugin(pluginsConfiguration.DefinePlugin)];
@@ -359,7 +354,7 @@ const getModules = () => {
       {
         test: /\.(sa|sc|c)ss$/,
         use: [
-          isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
+          MiniCssExtractPlugin.loader,
           'css-loader',
           {
             loader: 'postcss-loader',
@@ -425,25 +420,39 @@ const getModules = () => {
 };
 
 const getOptimization = () => {
-  const cacheGroupName = 'vendors';
   if (!isProduction) return {};
+  const cacheGroupName = 'vendors';
+  const shouldBoost = config.cache_boost && !config.externals;
+
+  const settings = {
+    boost: {
+      namedModules: true,
+      namedChunks: true,
+      moduleIds: 'named',
+      chunkIds: 'named',
+      runtimeChunk: 'single',
+      splitChunks: {
+        cacheGroups: {
+          [cacheGroupName]: {
+            chunks: 'all',
+            test: /node_modules/,
+          },
+        },
+      },
+    },
+    default: {
+      namedModules: false,
+      namedChunks: false,
+      moduleIds: false,
+      chunkIds: false,
+      runtimeChunk: false,
+    },
+  };
+
+  const settingsType = shouldBoost ? 'boost' : 'default';
 
   return {
-    namedModules: config.cache_boost,
-    namedChunks: config.cache_boost,
-    moduleIds: config.cache_boost ? 'named' : false,
-    chunkIds: config.cache_boost ? 'named' : false,
-    runtimeChunk: config.cache_boost ? 'single' : false,
-    splitChunks: config.cache_boost
-      ? {
-          cacheGroups: {
-            [cacheGroupName]: {
-              chunks: 'all',
-              test: /node_modules/,
-            },
-          },
-        }
-      : {},
+    ...settings[settingsType],
     minimizer: [
       new TerserPlugin({
         exclude: !config.minimize ? join(config.scripts.src, config.scripts.bundle) : undefined,
@@ -486,15 +495,20 @@ const addExternalEntries = (entries) => {
   };
   for (const external in config.externals) {
     const targetBundle = config.externals[external];
-    const order = config.externals.order || EXTERNAL_POSITIONS.before; // externals inclusion order, afterBundle - add after main bundles, beforeBundle - add before main bundles
+    // externals inclusion order, afterBundle - add after main bundles, beforeBundle - add before main bundles
+    const order = config.externals.order || EXTERNAL_POSITIONS.before;
 
     if (typeof targetBundle === 'object') {
       const bundles = targetBundle.map((bundle) => {
         const externalBundle = resolve(__dirname, config.src, bundle);
+        const pathExcludeSrc = bundle.replace(`${config.src}/`, '');
 
         if (existsSync(externalBundle)) {
           return externalBundle;
         }
+        return console.error(
+          `Path to externals should not include ${config.src}/, webpack resolve paths to this folder automatically. \nPlease change path to the following: ${pathExcludeSrc}`
+        );
       });
 
       if (order === EXTERNAL_POSITIONS.before) {

@@ -9,7 +9,8 @@
     "js": true
   },
   "server": {
-    "open": true
+    "open": true,
+    "index": "__routes.html"
   },
   "styles": {
     "bundle": "style",
@@ -34,12 +35,6 @@
     },
     "images": {
       "src": "images"
-    },
-    "video": {
-      "src": "video"
-    },
-    "ajax": {
-      "src": "inc"
     }
   }
 }
