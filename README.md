@@ -24,7 +24,7 @@ This generator is based on `Node JS` and `Yeoman` generator. For starters, you n
 [Yeoman](https://yeoman.io/) - `npm install -g yo`
 
 If you have Node JS already installed, please check version and make sure it is 10+:
- `node -v` - **If your version is earlier than 10 - upgrade your Node JS**
+* `node -v` - **If your version is earlier than 10 - upgrade your Node JS**
 
 Once you have Node JS and Yeoman installed, you are ready to install the generator itself.
 
@@ -103,10 +103,10 @@ To preview builded assets, for example. Used module `serve` under the hood.
 2. Prettify HTML after compilation
 ```
 #Using npm
-npm run pretify:html
+npm run prettify:html
 
 #Using yarn
-yarn pretify:html
+yarn prettify:html
 ```
 Uses Prettier to prettify HTML files from `dist` folder. Can be used only after compilation process.
 

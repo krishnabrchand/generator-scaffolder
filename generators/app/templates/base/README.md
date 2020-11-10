@@ -2,14 +2,14 @@
 
 #### Requirements
 
-* [Node JS](https://nodejs.org/) - install latest recommended
+* [Node JS](https://nodejs.org/) - install the latest recommended version(**minimal version is 10**)
 
-If you already have Node JS, then check version:
-* `node -v` - **should be 10+. If your version is earlier than 10 - upgrade your Node JS**
+If you have Node JS already installed, please check version and make sure it is 10+:
+* `node -v` - **If your version is earlier than 10 - upgrade your Node JS**
 
 ## How to use
 
-1.  Install project dependencies: (**_if you already has modules installed, skip this step_**)
+1. Install project dependencies: (**_if you already have modules installed, please skip this step_**)
 ```
 #Using npm
 npm i
@@ -28,7 +28,7 @@ npm run dev
 yarn dev
 ```
 
-3.  To compile all assest into production mode, run:
+3.  To compile all assests into production mode, run:
 ```
 #Using npm
 npm run build
@@ -50,14 +50,14 @@ yarn preview
 ```
 To preview builded assets, for example. Used module `serve` under the hood.
 
-2. Pretify HTML after compilation
+2. Prettify HTML after compilation
 ```
 #Using npm
-npm run pretify:html
+npm run prettify:html
 
 #Using yarn
-yarn pretify:html
+yarn prettify:html
 ```
-Uses Prettier to pretify HTML files from `dist` folder
+Uses Prettier to prettify HTML files from `dist` folder. Can be used only after compilation process.
 
-**_Dont use `npm` and `yarn` in the same project - this can lead to unnexpected results_**
+**_Don't use `npm` and `yarn` in the same project - this can lead to unexpected results_**
