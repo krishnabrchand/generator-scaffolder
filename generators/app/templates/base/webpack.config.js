@@ -58,17 +58,15 @@ const postServerMessage = (port, host = HOST) => {
   const routesPageURL = `${URL}/${routesPage}.html`;
   const RED = '\033[0;31m';
   const GREEN = '\033[0;32m';
-  const PURPLE = '\033[0;35m';
 
   return console.log(`
     ${RED}---------------------------------------
     🎉 ${GREEN}Server is running at port ${port}:
 
-    ${PURPLE}
-    📄 Routes are available at: ${routesPageURL}
+    📄 ${GREEN}Routes are available at: ${routesPageURL}
 
-    💻 Internal: ${URL}
-    🌎 External: ${IP}
+    💻 ${GREEN}Internal: ${URL}
+    🌎 ${GREEN}External: ${IP}
     ${RED}---------------------------------------
   `);
 };
