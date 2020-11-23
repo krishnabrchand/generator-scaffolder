@@ -13,6 +13,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
+const ImageminWebpWebpackPlugin = require('imagemin-webp-webpack-plugin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
@@ -167,14 +168,26 @@ const pluginsConfiguration = {
     cacheFolder: resolve(__dirname, 'node_modules/.cache'),
     disable: !isProduction,
     pngquant: {
-      quality: '70-80',
+      quality: 75,
     },
     plugins: [
       imageminMozjpeg({
-        quality: 70,
+        quality: 75,
         progressive: true,
       }),
     ],
+  },
+  ImageminWebp: {
+    config: [
+      {
+        test: /\.(jpe?g|png)/,
+        options: {
+          quality: 75,
+        },
+      },
+    ],
+    overrideExtension: true,
+    silent: true,
   },
 };
 
@@ -240,7 +253,7 @@ const htmlPlugins = () => {
 
 const getPlugins = () => {
   let devPlugins = [new webpack.DefinePlugin(pluginsConfiguration.DefinePlugin)];
-  let prodPlugins = [new ImageminPlugin(pluginsConfiguration.ImageMin)];
+  let prodPlugins = [];
 
   let defaultPlugins = [
     new FixStyleOnlyEntriesPlugin({ silent: true }),
@@ -248,7 +261,12 @@ const getPlugins = () => {
     new ErrorsPlugin(pluginsConfiguration.ErrorsPlugin),
     new MiniCssExtractPlugin(pluginsConfiguration.MiniCssExtract),
     new WebpackNotifierPlugin({ excludeWarnings: true }),
+    new ImageminPlugin(pluginsConfiguration.ImageMin),
   ];
+
+  if (config.webp) {
+    defaultPlugins.push(new ImageminWebpWebpackPlugin(pluginsConfiguration.ImageminWebp));
+  }
 
   if (generateStaticAssets().length) {
     defaultPlugins.push(new CopyWebpackPlugin(pluginsConfiguration.CopyPlugin));
