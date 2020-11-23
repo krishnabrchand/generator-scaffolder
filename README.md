@@ -23,7 +23,7 @@ This generator is based on `Node JS` and `Yeoman` generator. For starters, you n
 [Node JS](https://nodejs.org/) - install the latest recommended version(**minimal version is 10**)
 [Yeoman](https://yeoman.io/) - `npm install -g yo`
 
-If you have Node JS already installed, please check version and make sure it is 10+:
+If you have Node JS already installed, please check the version and make sure it is 10+:
 * `node -v` - **If your version is earlier than 10 - upgrade your Node JS**
 
 Once you have Node JS and Yeoman installed, you are ready to install the generator itself.
@@ -39,12 +39,12 @@ yarn global add generator-p2h
 ```
 
 The main disadvantage of this method is that you can grab only the released version of module, but not the one with minor fixes/upgrades. 
-***If you want always to be up-to-date - check next method.***
+***If you want always to be up-to-date - check the next method.***
 
 ### Local usage
-There is an option to use a generator as a local NPM module. The main benefit of this way of usage is that you don't have to wait until the generator is published to npm (not every fix/update/feature is published as a new version to NPM), but you can just `git pull` the latest code - and you are up do date with the latest version of the generator.
+There is an option to use a generator as a local NPM module. The main benefit of this way of usage is that you don't have to wait until the generator is published to npm (not every fix/update/feature is published as a new version to NPM), but you can just `git pull` the latest code - and you are up to date with the latest version of the generator.
 
-To install it there are a few steps are required:
+To install it there are a few steps required:
 1. Clone [github](https://github.com/mrlss/generator-scaffolder) repository - you can put this folder in any place you want 
 2. `cd` into this folder - `cd *YOUR_PATH*/generator-scaffolder` . Next step depends on which package manager you use, `NPM` or `Yarn`
 3. `npm link` or `yarn link`
@@ -67,9 +67,9 @@ npm i
 #Using yarn
 yarn
 ```
-Make sure your location is root of `markup` folder
+Make sure your location is the root of `markup` folder
 
-3.  To run development mode, run:
+3.  To run the development mode, run:
 ```
 #Using npm
 npm run dev
@@ -86,11 +86,11 @@ npm run build
 #Using yarn
 yarn build
 ```
-Build assets intro `dist` folder
+Build assets into `dist` folder
 
 **Additional utility scripts:**
 
-1. Run local webserver
+1. Run the local webserver
 ```
 #Using npm
 npm run preview
@@ -108,7 +108,7 @@ npm run prettify:html
 #Using yarn
 yarn prettify:html
 ```
-Uses Prettier to prettify HTML files from `dist` folder. Can be used only after compilation process.
+Use Prettier to prettify HTML files from `dist` folder. Can be used only after the compilation process.
 
 **_Don't use `npm` and `yarn` in the same project - this can lead to unexpected results_**
 
@@ -119,7 +119,7 @@ The main bundler for a project is [Webpack](https://webpack.js.org/). All intern
 
 #### Webpack
 
-###### Always enabled:
+###### Always is enabled:
 - `Babel` - is a JavaScript ES6+ syntax transpiler, that gives us an advantage of modern JS syntax features that are understandable for all browsers (IE11+)
 
 ###### Can be configured:
@@ -132,7 +132,7 @@ You can enable/disable those options when generating a project or in an already 
 Internal configuration for a project folder structure and some major features can be controlled using `config.json`.
 The main idea behind this file is to control webpack behavior without webpack configuration change.
 
-You can see default structure of this file: **`enable/disable` means `true/false`**
+You can see the default structure of this file: **`enable/disable` means `true/false`**
 
 ```
 {
@@ -229,7 +229,7 @@ In this case you can generate dummy project with those options enabled and grab 
     "extension": "scss"
 },
 ```
-`bundle`: filename for you `SCSS` main file and generated CSS filename
+`bundle`: filename for your `SCSS` main file and generated CSS filename
 `src`: folder where the styles bundle is located
 `dest`: folder where to put compiled CSS
 `extension`: currently only SCSS
@@ -243,7 +243,7 @@ In this case you can generate dummy project with those options enabled and grab 
     "extension": "js"
 },
 ```
-`bundle`: filename for you `JS` main file and generated JS filename
+`bundle`: filename for your `JS` main file and generated JS filename
 `src`: folder where the JS bundle is located
 `dest`: folder where to put compiled JS
 `extension`: can be `js` or `ts` if you need `TypeScript` (with TypeScript some custom configuration is required)
@@ -258,7 +258,7 @@ assets
 webpack.config.js
 ```
 
-Your `config.json` should be re-configure to follow this structure:
+Your `config.json` should be re-configured to follow this structure:
 ```
 "src": "assets",
 "styles": {
@@ -331,7 +331,7 @@ Another usecase for the static option is a favicon. You can create folder name `
 }
 ```
 
-And result will be as follows:
+And the result will be as follows:
 ```
 dist
     favicon.ico
@@ -406,7 +406,7 @@ If you have a requirement to create a unique JS and CSS file for every page, e.g
 ## FAQ
 
 * **Question**: I added/removed a page, but it does not appear in the pages list and I get an error in console.
-    **Answer**: Restart the build. Webpack generate pages list on runtime and watch them. If the page is deleted - webpack throws an error that it can't find this particular page, and if you add a new page while webpack is running, you need to restart it once again so webpack can add it to the context.
+    **Answer**: Restart the build. Webpack generates pages list on runtime and watches them. If the page is deleted - webpack throws an error that it can't find this particular page, and if you add a new page while webpack is running, you need to restart it once again so that webpack can add it to the context.
 * **Question**: When I include jQuery plugin from the builder, I get an error in console `PluginName is not defined`.
     **Answer**: You need to change contex from `this` to `window`, for example in `accordion plugin` 
     ```
