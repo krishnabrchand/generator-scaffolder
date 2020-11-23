@@ -58,7 +58,7 @@ const OTHER_FILES = {
 const GENERAL_TEST_SETTINGS = [
   {
     linters: false,
-    staticUnexpectedFiles: [...OTHER_FILES.linters.general, ...OTHER_FILES.linters.css, ...OTHER_FILES.linters.js],
+    staticUnexpectedFiles: [...OTHER_FILES.linters.css, ...OTHER_FILES.linters.js],
   },
   {
     linters: ['css'],

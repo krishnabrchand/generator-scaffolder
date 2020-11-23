@@ -28,7 +28,6 @@ module.exports = async function writeFiles() {
         },
       };
 
-      copyFiles(['linters/general', PATHS.destination]);
       modifyConfig(lintersSettings);
 
       if (lintCSS) {

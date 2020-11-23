@@ -1,21 +1,23 @@
 const chalk = require('chalk');
 const chai = require('chai');
 const helpers = require('yeoman-test');
-const {chaiExecAsync} = require('chai-exec');
-const {cleanUpFolder} = require('./utils');
-const {PATHS, SCRIPTS, GENERAL_TEST_SETTINGS} = require(`${process.cwd()}/generators/app/globals`);
-const {setProcessToDestination, projectTypeMessage} = require(`${process.cwd()}/generators/app/utils`);
+const { chaiExecAsync } = require('chai-exec');
+const { cleanUpFolder } = require('./utils');
+const { PATHS, SCRIPTS, GENERAL_TEST_SETTINGS } = require(`${process.cwd()}/generators/app/globals`);
+const { setProcessToDestination, projectTypeMessage } = require(`${process.cwd()}/generators/app/utils`);
 
 const ONLY_FILES_TEST = process.env.FILES_ONLY;
 const assert = chai.assert;
 
 chai.use(chaiExecAsync);
 
-function template({staticExpectedFiles = [], expectedFilesContent = {}, generalSettings = {}}, callback) {
+console.log(SCRIPTS);
+
+function template({ staticExpectedFiles = [], expectedFilesContent = {}, generalSettings = {} }, callback) {
   return Promise.all([
     GENERAL_TEST_SETTINGS.forEach((prompts) => {
-      const testSettings = {...prompts, ...generalSettings, expectedFilesContent, staticExpectedFiles};
-      const {afterFilesCreated, afterSettingsSetup, afterBuildProcess, afterModulesInstallation, afterBuildRun} = callback({testSettings});
+      const testSettings = { ...prompts, ...generalSettings, expectedFilesContent, staticExpectedFiles };
+      const { afterFilesCreated, afterSettingsSetup, afterBuildProcess, afterModulesInstallation, afterBuildRun } = callback({ testSettings });
 
       describe(projectTypeMessage(testSettings), () => {
         before(async () => {
