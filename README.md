@@ -117,18 +117,20 @@ Use Prettier to prettify HTML files from `dist` folder. Can be used only after t
 The main bundler for a project is [Webpack](https://webpack.js.org/). All internal project logic is based on `Webpack` and `config.json` file.
 *Depending on which options you choose while generating your projects, output features may vary:*
 
-#### Webpack
+### Webpack
 
-###### Always is enabled:
+#### Always is enabled:
 - `Babel` - is a JavaScript ES6+ syntax transpiler, that gives us an advantage of modern JS syntax features that are understandable for all browsers (IE11+)
 
-###### Can be configured:
+#### Can be configured:
 - `Eslint` - JavaScript syntax linter (can be re-configured with any type of config if a client requested in `eslintrc.js` file);
 - `Stylelint` - SCSS syntax linter is based on [SASS Guidelines](https://sass-guidelin.es/) (can be re-configured in `stylelint.config.js` file)
 
 You can enable/disable those options when generating a project or in an already generated project in `config.json` file.
 
-#### Config file ⚙️
+
+
+### Config file ⚙️
 Internal configuration for a project folder structure and some major features can be controlled using `config.json`.
 The main idea behind this file is to control webpack behavior without webpack configuration change.
 
@@ -184,7 +186,9 @@ You can see the default structure of this file: **`enable/disable` means `true/f
 
 Lets take a closer look into each of the config sections:
 
-#### Baseline
+
+
+### Baseline
 `"src": "src"` - source files folder name. If you need another folder - rename folder and change this name inside `config`.
 
 `"dest": "dist"` - folder where all the files will be compiled, same as with src - if you need to change this, rename the folder and change `config`.
@@ -195,7 +199,9 @@ Lets take a closer look into each of the config sections:
 
 `"minimize": true` - if `false` - disable `CSS/JS` minification. Enabled by default
 
-#### Linters
+
+
+### Linters
 ```
 "linters": {
     "css": true,
@@ -212,7 +218,7 @@ If a project was generated **without** `linters` option enabled - you can't `ena
 
 In this case you can generate dummy project with those options enabled and grab `styleline.config.js, .stylelintignore, .prettierignore, prettier.config.js, eslintrc.js` files and put into root of your project folder.
 
-#### Webpack dev server configuration
+### Webpack dev server configuration
 ```
 "server": {
     "open": true
@@ -220,7 +226,7 @@ In this case you can generate dummy project with those options enabled and grab 
 ```
 `open`: if `true` - new page will open every time you start the build.  If you don't need this - switch to `false`
 
-#### Styles bundle configuration
+### Styles bundle configuration
 ```
 "styles": {
     "bundle": "style",
@@ -234,7 +240,7 @@ In this case you can generate dummy project with those options enabled and grab 
 `dest`: folder where to put compiled CSS
 `extension`: currently only SCSS
 
-#### Scripts bundle configuration
+### Scripts bundle configuration
 ```
 "scripts": {
     "bundle": "app",
@@ -274,7 +280,7 @@ Your `config.json` should be re-configured to follow this structure:
 ```
 **NOTE**: all paths (`src/dest`) are resolved to to your `src` and `dest` folders configured in **Baseline**, so you don't need to specify `src/` in each pathname.
 
-#### Templates
+### Templates
 ```
 "templates": {
     "src": "views",
@@ -286,7 +292,7 @@ Your `config.json` should be re-configured to follow this structure:
 `dest`: folder where to put files. In this configuration the files are placed into root of `dest` folder configured in **Baseline**
 `extension`: this can be different if you choose templating languages such as pug or twig.
 
-#### Static files
+### Static files
 ```
 "static": {
     "fonts": {
@@ -337,7 +343,7 @@ dist
     favicon.ico
 ```
 
-#### Externals
+### Externals
 There is a specific option available in config called `externals`. This option is needed when you need to add external bundles outside of main bundles, or you need to include bootstrap in a separate file, for example, or you need to create a unique CSS/JS file for every page.
 ```
 "externals": {
@@ -404,7 +410,7 @@ If you have a requirement to create a unique JS and CSS file for every page, e.g
     Same for **team.html**
 
 
-#### Enable/disable Webp image support
+### Enable/disable Webp image support
 By default, webp images are `disabled`. To enable it, you can add `"webp": true` into `config.json` file, e.g.:
 ```
 {
@@ -429,6 +435,7 @@ Taking into account that support for `Webp` is not that good https://caniuse.com
 ```
 *The real `img[src]` attribute should always load `original` image (e.g. `.jpg/.png`).*
 *You can also use lazyload libraries such as [this one](https://www.npmjs.com/package/vanilla-lazyload) or any other that you like to take full advantage of fast loading speed*
+
 
 
 ## FAQ
