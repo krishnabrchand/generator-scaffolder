@@ -403,6 +403,34 @@ If you have a requirement to create a unique JS and CSS file for every page, e.g
     ```
     Same for **team.html**
 
+
+#### Enable/disable Webp image support
+By default, webp images are `disabled`. To enable it, you can add `"webp": true` into `config.json` file, e.g.:
+```
+{
+  "src": "src",
+  "dest": "dist",
+  "webp": true,
+  ...
+}
+```
+After enabling this feature, all `jpg/png` files will be taken into account to generate `.webp` variant of each image. As a result, you receive:
+
+* original image, e.g `image.jpg`
+* webp format image, e.g `image.webp`
+
+Taking into account that support for `Webp` is not that good https://caniuse.com/webp, we should always take care of `fallback` images to make sure that it works everywhere. In most cases, you can use this part of code provided below:
+```
+<picture>
+    <source srcset="images/image01.webp" type="image/webp">
+    <source srcset="images/image01.jpg" type="image/jpeg">
+    <img src="images/image01.jpg">
+</picture>
+```
+*The real `img[src]` attribute should always load `original` image (e.g. `.jpg/.png`).*
+*You can also use lazyload libraries such as [this one](https://www.npmjs.com/package/vanilla-lazyload) or any other that you like to take full advantage of fast loading speed*
+
+
 ## FAQ
 
 * **Question**: I added/removed a page, but it does not appear in the pages list and I get an error in console.
