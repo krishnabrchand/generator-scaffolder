@@ -348,6 +348,17 @@ const getScriptsLoader = (templateType) => {
   };
 };
 
+const getStaticAssetOutputPath = ({ assets, outputFolder, parsedUrlPath, stylesDest }) => {
+  const { src } = assets;
+  const destination = posix.relative(stylesDest, outputFolder);
+  const source = posix.join(config.src, src);
+  const resultPath = parsedUrlPath.dir.replace(source, destination);
+
+  parsedUrlPath.dir = resultPath;
+
+  return posix.format(parsedUrlPath);
+};
+
 const getModules = () => {
   const modules = {
     rules: [
@@ -391,6 +402,7 @@ const getModules = () => {
               name: '[path][name].[ext]',
               emitFile: false,
               publicPath: function (url) {
+                const { dest } = config.styles;
                 const parsedPath = parse(url);
                 const isFonts = url.includes(config.static.fonts.src);
                 const isImages = url.includes(config.static.images.src);
@@ -398,11 +410,19 @@ const getModules = () => {
                 const imagesOutput = config.static.images.dest ? config.static.images.dest : config.static.images.src;
 
                 if (isFonts) {
-                  parsedPath.dir = posix.relative(config.styles.dest, fontsOutput);
-                  return posix.format(parsedPath);
+                  return getStaticAssetOutputPath({
+                    assets: config.static.fonts,
+                    outputFolder: fontsOutput,
+                    parsedUrlPath: parsedPath,
+                    stylesDest: dest,
+                  });
                 } else if (isImages) {
-                  parsedPath.dir = posix.relative(config.styles.dest, imagesOutput);
-                  return posix.format(parsedPath);
+                  return getStaticAssetOutputPath({
+                    assets: config.static.images,
+                    outputFolder: imagesOutput,
+                    parsedUrlPath: parsedPath,
+                    stylesDest: dest,
+                  });
                 } else {
                   return url;
                 }
