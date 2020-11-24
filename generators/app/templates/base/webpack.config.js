@@ -621,7 +621,7 @@ const getEntries = () => {
 const webpackConfig = {
   mode: ENV,
   entry: getEntries(),
-  devtool: isProduction ? false : 'eval-source-map',
+  devtool: isProduction ? false : 'source-map',
   stats: isProduction,
   output: {
     publicPath: PUBLIC_PATH,
