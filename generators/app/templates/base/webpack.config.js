@@ -92,6 +92,19 @@ const generateStaticAssets = () => {
 };
 
 const pluginsConfiguration = {
+  HTMLWebpackPlugin: {
+    minify: false,
+    inject: 'body',
+    hash: isProduction && !config.externals ? config.cache_boost : false,
+    scriptLoading: 'defer',
+    cache: false,
+    meta: {
+      viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no',
+    },
+    optimize: {
+      prefetch: true,
+    },
+  },
   DevServer: {
     contentBase: posix.relative(__dirname, config.dest),
     hot: true,
@@ -206,17 +219,7 @@ const generateHtmlPlugins = () => {
       template,
       filename,
       excludeChunks: [routesPage],
-      minify: false,
-      inject: 'body',
-      hash: isProduction && !config.externals ? config.cache_boost : false,
-      scriptLoading: 'defer',
-      cache: false,
-      meta: {
-        viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no',
-      },
-      optimize: {
-        prefetch: true,
-      },
+      ...pluginsConfiguration.HTMLWebpackPlugin,
     });
   });
 };
