@@ -1,4 +1,4 @@
-import ready, { HTML } from './utils/global';
+import ready, { HTML } from './utils';
 
 ready(() => {
   HTML.classList.add('is-loaded');
