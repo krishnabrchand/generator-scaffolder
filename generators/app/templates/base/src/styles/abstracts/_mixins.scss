@@ -157,6 +157,7 @@
 //     or @include animate(color width, 1s, linear);
 //
 $animation-speed: 0.3s !default;
+$transition-duration-base: ease-in-out !default;
 
 @mixin transition($properties, $duration: $transition-duration-base, $easing: $transition-easing-base) {
   $list: ();

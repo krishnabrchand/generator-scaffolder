@@ -1,7 +1,6 @@
 // 1. Configuration and helpers
 @import 'abstracts/variables';
 @import 'abstracts/functions';
-@import 'abstracts/mixins';
 
 // 2. Vendors
 @import 'vendors/bootstrap-utilities';
@@ -9,6 +8,7 @@
 @import 'vendors-extensions/bootstrap';
 @import 'vendors/bootstrap';
 @import 'vendors/icomoon/styles';
+@import 'abstracts/mixins';
 
 
 // 3. Base styles and elements
