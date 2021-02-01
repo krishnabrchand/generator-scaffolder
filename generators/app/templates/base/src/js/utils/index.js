@@ -68,48 +68,6 @@ export default Document.prototype.ready = (fn) => {
 };
 
 /*
-  Utility function for native wrap:
-  @params: el - NodeElement - element that we need to wrap
-  @params: wrapper - NodeElement - parent for element to wrap
-
-  @return: void;
-*/
-export const wrap = (el, wrapper) => {
-  el.parentNode.insertBefore(wrapper, el);
-  wrapper.appendChild(el);
-};
-
-/*
-  Utility function for native wrap of nodeList:
-  @params: nodes - NodeList[] - an array of elements to wrap
-  @params: wrapper - NodeElement - parent for nodes to wrap
-
-  @return: void;
-*/
-
-export const wrapAll = (nodes, wrapper) => {
-  // Cache the current parent and previous sibling of the first node.
-  var parent = nodes[0].parentNode;
-  var previousSibling = nodes[0].previousSibling;
-
-  // Place each node in wrapper.
-  //  - If nodes is an array, we must increment the index we grab from
-  //    after each loop.
-  //  - If nodes is a NodeList, each node is automatically removed from
-  //    the NodeList when it is removed from its parent with appendChild.
-  for (var i = 0; nodes.length - i; wrapper.firstChild === nodes[0] && i++) {
-    wrapper.appendChild(nodes[i]);
-  }
-
-  // Place the wrapper just after the cached previousSibling,
-  // or if that is null, just before the first child.
-  var nextSibling = previousSibling ? previousSibling.nextSibling : parent.firstChild;
-  parent.insertBefore(wrapper, nextSibling);
-
-  return wrapper;
-};
-
-/*
   Publish custom event
   Params:
 

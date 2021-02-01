@@ -42,10 +42,11 @@ const getAssetName = (dest, name, ext) => {
 };
 
 const getAllPagesExceptRoutes = () => {
-  let templateFiles = readdir.sync(getAssetPath(SRC, sitePages), {
-    deep: true,
+  const templateFiles = readdir.sync(getAssetPath(SRC, sitePages), {
+    deep: !config.templates.extension === 'html',
     filter: function (stats) {
-      return stats.isFile() && stats.path.indexOf('_') === -1;
+      const filteredFiles = stats.isFile() && !stats.path.includes(routesPage) && stats.path !== '.DS_Store' && stats.path.includes(config.templates.extension);
+      return stats.isFile() && filteredFiles;
     },
   });
 
@@ -609,7 +610,11 @@ const getEntries = () => {
     const entryCSSFile = join(config.styles.src, `${config.styles.bundle}.${config.styles.extension}`);
     const styleAsset = getAssetPath(SRC, entryCSSFile);
 
-    entries[config.styles.bundle] = [styleAsset];
+    if (entries[config.styles.bundle]) {
+      entries[config.styles.bundle].push(styleAsset);
+    } else {
+      entries[config.styles.bundle] = [styleAsset];
+    }
   }
 
   if (!isProduction) {
