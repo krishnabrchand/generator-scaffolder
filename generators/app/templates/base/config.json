@@ -2,7 +2,7 @@
   "src": "src",
   "dest": "dist",
   "debug": false,
-  "cache_boost": true,
+  "cache_boost": false,
   "minimize": true,
   "linters": {
     "css": true,

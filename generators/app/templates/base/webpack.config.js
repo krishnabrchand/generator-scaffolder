@@ -302,6 +302,7 @@ const getPlugins = () => {
 const getTemplatesLoader = (templateType) => {
   const PUG = new RegExp('pug');
   const TWIG = new RegExp('twig');
+  const viewsPath = join(config.src, config.templates.src);
 
   if (PUG.test(templateType)) {
     return {
@@ -336,9 +337,9 @@ const getTemplatesLoader = (templateType) => {
               return context.fs.readJsonSync(data, { throws: false }) || {};
             },
             namespaces: {
-              layout: resolve(__dirname, 'src/views/_layout'),
-              components: resolve(__dirname, 'src/views/_components'),
-              includes: resolve(__dirname, 'src/views/_includes'),
+              layout: resolve(__dirname, join(viewsPath, '_layout')),
+              components: resolve(__dirname, join(viewsPath, '_components')),
+              includes: resolve(__dirname, join(viewsPath, '_includes')),
             },
           },
         },
